@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ur-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Aaj ki Instagram Post</title>
+<style>
+  :root { color-scheme: light; --bg:#fff8f4; --ink:#3d1226; --wine:#5a1635; --rose:#b4506f; --line:#ecd3d8; --white:#fff; }
+  body { background: var(--bg); color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 20px 16px; display: grid; gap: 14px; }
+  h1 { font: italic 24px Georgia, serif; color: var(--wine); margin: 0; }
+  p { margin: 0; line-height: 1.5; }
+  [hidden] { display: none !important; }
+  .go { display: block; width: 100%; box-sizing: border-box; text-align: center; background: var(--wine); color: var(--white);
+        text-decoration: none; font: 700 18px "Segoe UI", Arial, sans-serif; padding: 18px; border: 0; border-radius: 40px;
+        cursor: pointer; }
+  #status { min-height: 21px; color: var(--rose); font-weight: 600; }
+  #fallback { display: grid; gap: 12px; border: 2px solid var(--line); border-radius: 14px; padding: 14px; background: var(--white); }
+  #photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  #photos img { width: 100%; border-radius: 8px; }
+  textarea { width: 100%; box-sizing: border-box; height: 300px; padding: 12px; border: 1px solid var(--line);
+             border-radius: 12px; font: 14px/1.5 "Segoe UI", Arial, sans-serif; color: var(--ink); background: var(--white); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pearl Tops Pair</h1>
+  <p>26 Nov 2026 &middot; Rs 499 &middot; Photos: 3</p>
+  <button class="go" id="share" type="button">Instagram par bhejein + caption copy</button>
+  <p id="status" role="status"></p>
+  <p>Phone par: button dabayein, share menu mein <b>Instagram</b> (Post / Feed) chunein, caption ki jagah daba kar <b>Paste</b> karein, gaana lagayein aur Share karein.</p>
+  <section id="fallback" hidden>
+    <p><b>Is browser se photos seedha Instagram ko nahi ja saktin.</b> Agar page Gmail ke andar khula hai to menu se Chrome ya Safari mein kholein. Warna Neeche har photo ko daba kar Save karein (1 se 3 tak), phir Instagram kholein.</p>
+    <a class="go" href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram kholein</a>
+    <p id="reason"></p>
+  </section>
+  <div id="photos"></div>
+  <textarea id="caption" readonly aria-label="Caption">💖 Pearl Tops Pair
+
+Khud ko bhi tohfa dena banta hai! 🎁
+
+👉 Swipe karke saari photos dekhein
+
+🔸 Metal: Copper/Alloy
+💎 Stone: Synthetic/Imitation
+📏 Size: 2cm x 2cm
+✨ Plating: Golden Plated
+📦 Set mein: 1x Pair of Tops
+💰 Qeemat: sirf Rs 499
+🚚 Delivery charges alag
+🔖 Code: CETH141
+
+📲 Order ke liye call ya message karein: 0316-3001677
+Comment mein ❤️ likhein aur apni saheli ko tag karein!
+
+#ArtificialJewellery #JewelleryPakistan #PakistaniJewellery #JewelleryLovers #WomenFashion #WeddingSeason #OnlineShoppingPakistan</textarea>
+</main>
+<script src="photos.js?v=52f0d446669e"></script>
+<script>
+  const box = document.getElementById("caption");
+  const status = document.getElementById("status");
+  const photos = window.PHOTOS || [];
+  const say = text => { status.textContent = text; };
+  // Files are prepared when the page opens: sharing has to start straight from the tap.
+  const files = photos.map(photo => {
+    const bytes = Uint8Array.from(atob(photo.data), c => c.charCodeAt(0));
+    return new File([bytes], photo.name, { type: "image/jpeg" });
+  });
+  photos.forEach((photo, i) => {
+    const image = new Image();
+    image.src = "data:image/jpeg;base64," + photo.data;
+    image.alt = "Photo " + (i + 1);
+    document.getElementById("photos").appendChild(image);
+  });
+
+  function copyCaption() {
+    let copied = false;
+    box.focus({ preventScroll: true }); box.select(); box.setSelectionRange(0, box.value.length);
+    try { copied = document.execCommand("copy"); } catch (e) {}
+    box.blur();
+    if (!navigator.clipboard) return Promise.resolve(copied);
+    return navigator.clipboard.writeText(box.value).then(() => true, () => copied);
+  }
+  const copyText = ok => ok ? "Caption copy ho gaya." : "Caption copy nahi hua: neeche caption ko daba kar Copy karein.";
+  function fallBack(reason, copy) {
+    document.getElementById("fallback").hidden = false;
+    document.getElementById("reason").textContent = "Wajah: " + reason;
+    copy.then(ok => say(copyText(ok)));
+  }
+
+  document.getElementById("share").addEventListener("click", () => {
+    const copy = copyCaption();
+    if (!files.length) return fallBack("photos load nahi huin", copy);
+    if (!navigator.share || !navigator.canShare || !navigator.canShare({ files })) {
+      return fallBack("share ki sahulat nahi", copy);
+    }
+    navigator.share({ files }).then(
+      () => copy.then(ok => say(copyText(ok) + " Instagram mein Paste karein.")),
+      error => {
+        if (error.name === "AbortError") return copy.then(ok => say(copyText(ok) + " Share band hua, dobara button dabayein."));
+        fallBack(error.name, copy);
+      });
+  });
+</script>
+</body>
+</html>
